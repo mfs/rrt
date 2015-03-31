@@ -15,8 +15,16 @@
 
 extern crate image;
 
+mod vector;
+mod ray;
+mod geometry;
+
 use std::fs::File;
 use std::path::Path;
+use vector::Vector;
+use ray::Ray;
+use geometry::Sphere;
+use geometry::Geometry;
 
 fn main() {
 
@@ -25,11 +33,17 @@ fn main() {
 
    let mut img = image::ImageBuffer::new(imgx, imgy);
 
+   let dir = Vector::new(0.0, 0.0, -1.0);
+   let s = Sphere::new(250.0, 250.0, -1000.0, 150.0);
+
    for y in (0 .. imgx) {
       for x in (0 .. imgy) {
-         let px: u8 = ((x * 255 )as f32 / imgx as f32) as u8;
-         let py: u8 = ((y * 255 )as f32 / imgy as f32) as u8;
-         img.put_pixel(x, y, image::Rgb([px, 0, py]));
+         let r = Ray { origin: Vector::new(y as f32, x as f32, 0.0), direction: dir };
+         if s.intersect(r) {
+            img.put_pixel(x, y, image::Rgb([255, 0, 0]));
+         } else {
+            img.put_pixel(x, y, image::Rgb([0, 0, 0]));
+         }
       }
    }
 
@@ -38,4 +52,5 @@ fn main() {
       Ok(_) => (),
       Err(err) => {println!("{}", err)},
    }
+
 }
