@@ -39,11 +39,13 @@ fn main() {
    for y in (0 .. imgx) {
       for x in (0 .. imgy) {
          let r = Ray { origin: Vector::new(y as f32, x as f32, 0.0), direction: dir };
-         if s.intersect(r) {
-            img.put_pixel(x, y, image::Rgb([255, 0, 0]));
-         } else {
-            img.put_pixel(x, y, image::Rgb([0, 0, 0]));
-         }
+
+         let color = match s.intersect(r) {
+            None => image::Rgb([0, 0, 0]),
+            Some(hr) => image::Rgb([hr.color.x as u8, hr.color.y as u8, hr.color.z as u8]),
+         };
+
+         img.put_pixel(x, y, color);
       }
    }
 

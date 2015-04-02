@@ -17,7 +17,7 @@ use vector::{Vector, dot};
 use ray::Ray;
 
 pub trait Geometry {
-   fn intersect(&self, r: Ray) -> bool;
+   fn intersect(&self, r: Ray) -> Option<HitRecord>;
 }
 
 #[derive(Debug,Copy,Clone)]
@@ -33,7 +33,7 @@ impl Sphere {
 }
 
 impl Geometry for Sphere {
-   fn intersect(&self, r: Ray) -> bool {
+   fn intersect(&self, r: Ray) -> Option<HitRecord> {
 
       let l = self.origin - r.origin;
       let s = dot(l, r.direction);
@@ -41,16 +41,24 @@ impl Geometry for Sphere {
       let rr = self.radius * self.radius;
 
       if s < 0.0 && ll > rr {
-         return false;
+         return None;
       }
 
       let mm = ll - s * s;
       if mm > rr {
-         return false;
+         return None;
       }
 
-      true
+      Some(HitRecord {
+         t: 0.0,
+         normal: Vector::zero(),
+         color: Vector::new(0.0, 0.0, 255.0)
+      })
    }
 }
 
-
+pub struct HitRecord {
+   pub t: f32,
+   pub normal: Vector,
+   pub color: Vector,
+}
