@@ -48,14 +48,21 @@ fn main() {
 
    for y in (0 .. imgx) {
       for x in (0 .. imgy) {
-         let r = Ray { origin: Vector::new(y as f32, x as f32, 0.0), direction: dir };
+         let mut tmax = 100000.0;
+         let mut color = [0, 0, 0];
+         let r = Ray { origin: Vector::new(x as f32, y as f32, 0.0), direction: dir };
 
-         let color = match s.intersect(r, 0.00001, 100000.0) {
-            None => image::Rgb([0, 0, 0]),
-            Some(hr) => image::Rgb([hr.color.x as u8, hr.color.y as u8, hr.color.z as u8]),
-         };
+         for sh in shapes.iter() {
+            match sh.intersect(r, 0.00001, tmax) {
+               None => {},
+               Some(hr) => {
+                  tmax = hr.t;
+                  color = [hr.color.x as u8, hr.color.y as u8, hr.color.z as u8]
+               },
+            }
+         }
 
-         img.put_pixel(x, y, color);
+         img.put_pixel(x, imgy - y - 1, image::Rgb(color));
       }
    }
 
