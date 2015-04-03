@@ -13,7 +13,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-use vector::{Vector, dot};
+use vector::{Vector, dot, cross};
 use ray::Ray;
 
 pub trait Geometry {
@@ -53,6 +53,44 @@ impl Geometry for Sphere {
          t: 0.0,
          normal: Vector::zero(),
          color: Vector::new(0.0, 0.0, 255.0)
+      })
+   }
+}
+
+#[derive(Debug,Copy,Clone)]
+pub struct Triangle {
+   pub v0: Vector,
+   pub v1: Vector,
+   pub v2: Vector,
+}
+
+impl Geometry for Triangle {
+   fn intersect(&self, r: Ray) -> Option<HitRecord> {
+      const EPS: f32 = 1e-5;
+      let e1 = self.v1 - self.v0;
+      let e2 = self.v2 - self.v0;
+      let p = cross(r.direction, e2);
+      let a = dot(e1, p);
+      if a > -EPS && a < EPS {
+         return None;
+      }
+      let f = 1.0 / a;
+      let s = r.origin - self.v0;
+      let u = f * dot(s, p);
+      if u < 0.0 || u > 1.0 {
+         return None;
+      }
+      let q = cross(s, e1);
+      let v = f * dot(r.direction, q);
+      if v < 0.0 || (u + v) > 1.0 {
+         return None;
+      }
+      let t = f * dot(e2, q);
+
+      Some(HitRecord {
+         t: t,
+         normal: Vector::zero(),
+         color: Vector::new(255.0, 0.0, 0.0)
       })
    }
 }
