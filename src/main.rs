@@ -25,6 +25,7 @@ use vector::Vector;
 use ray::Ray;
 use geometry::Sphere;
 use geometry::Geometry;
+use geometry::Triangle;
 
 fn main() {
 
@@ -35,6 +36,15 @@ fn main() {
 
    let dir = Vector::new(0.0, 0.0, -1.0);
    let s = Sphere::new(250.0, 250.0, -1000.0, 150.0);
+   let t = Triangle {
+      v0: Vector::new(300.0, 600.0, -800.0),
+      v1: Vector::new(0.0, 100.0, -1000.0),
+      v2: Vector::new(450.0, 20.0, -1000.0),
+   };
+
+   let mut shapes: Vec<&Geometry> = Vec::new();
+   shapes.push(&s);
+   shapes.push(&t);
 
    for y in (0 .. imgx) {
       for x in (0 .. imgy) {
