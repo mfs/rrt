@@ -18,7 +18,7 @@ use vector::{Vector, dot, cross};
 use ray::Ray;
 
 pub trait Geometry {
-   fn intersect(&self, r: Ray) -> Option<HitRecord>;
+   fn intersect(&self, r: Ray, tmin: f32, tmax: f32) -> Option<HitRecord>;
 }
 
 #[derive(Debug,Copy,Clone)]
@@ -34,7 +34,7 @@ impl Sphere {
 }
 
 impl Geometry for Sphere {
-   fn intersect(&self, r: Ray) -> Option<HitRecord> {
+   fn intersect(&self, r: Ray, tmin: f32, tmax: f32) -> Option<HitRecord> {
 
       let l = self.origin - r.origin;
       let s = dot(l, r.direction);
@@ -53,6 +53,10 @@ impl Geometry for Sphere {
       let q = Float::sqrt(rr - mm);
       let t = if ll > rr { s - q } else { s + q };
 
+      if t < tmin || t > tmax {
+         return None;
+      }
+
       Some(HitRecord {
          t: t,
          normal: Vector::zero(),
@@ -69,7 +73,7 @@ pub struct Triangle {
 }
 
 impl Geometry for Triangle {
-   fn intersect(&self, r: Ray) -> Option<HitRecord> {
+   fn intersect(&self, r: Ray, tmin: f32, tmax: f32) -> Option<HitRecord> {
       const EPS: f32 = 1e-5;
       let e1 = self.v1 - self.v0;
       let e2 = self.v2 - self.v0;
@@ -90,6 +94,10 @@ impl Geometry for Triangle {
          return None;
       }
       let t = f * dot(e2, q);
+
+      if t < tmin || t > tmax {
+         return None;
+      }
 
       Some(HitRecord {
          t: t,

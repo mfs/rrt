@@ -50,7 +50,7 @@ fn main() {
       for x in (0 .. imgy) {
          let r = Ray { origin: Vector::new(y as f32, x as f32, 0.0), direction: dir };
 
-         let color = match s.intersect(r) {
+         let color = match s.intersect(r, 0.00001, 100000.0) {
             None => image::Rgb([0, 0, 0]),
             Some(hr) => image::Rgb([hr.color.x as u8, hr.color.y as u8, hr.color.z as u8]),
          };
