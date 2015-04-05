@@ -4,5 +4,5 @@ name = "rrt"
 version = "0.0.1"
 authors = ["Mike Sampson <mike@sambodata.com>"]
 
-[dependencies.image]
-git = "https://github.com/PistonDevelopers/image.git"
+[dependencies]
+byteorder = "*"
