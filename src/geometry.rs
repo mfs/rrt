@@ -13,7 +13,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-use std::num::Float;
 use vector::{Vector, dot, cross};
 use ray::Ray;
 
@@ -50,7 +49,7 @@ impl Geometry for Sphere {
          return None;
       }
 
-      let q = Float::sqrt(rr - mm);
+      let q = (rr - mm).sqrt();
       let t = if ll > rr { s - q } else { s + q };
 
       if t < tmin || t > tmax {
