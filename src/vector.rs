@@ -22,16 +22,33 @@ pub struct Vector {
    pub z: f32,
 }
 
-// Constructors
-
 impl Vector {
 
+   // Constructors
    pub fn new(x: f32, y: f32, z: f32) -> Vector {
       Vector {x: x, y: y, z: z }
    }
 
    pub fn zero() -> Vector {
       Vector::new(0.0, 0.0, 0.0)
+   }
+
+   // Magnitude related
+   pub fn magnitude_sq(self) -> f32 {
+      dot(self, self)
+   }
+
+   pub fn magnitude(self) -> f32 {
+      self.magnitude_sq().sqrt()
+   }
+
+   pub fn normalize(self) -> Vector {
+      let inv_magnitude = 1.0 / self.magnitude();
+      Vector {
+         x: self.x * inv_magnitude,
+         y: self.y * inv_magnitude,
+         z: self.z * inv_magnitude,
+      }
    }
 }
 
