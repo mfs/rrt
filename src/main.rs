@@ -19,6 +19,7 @@ mod vector;
 mod ray;
 mod geometry;
 mod camera;
+mod color;
 
 use std::fs::File;
 use std::path::Path;
@@ -27,6 +28,7 @@ use geometry::Sphere;
 use geometry::Geometry;
 use byteorder::{LittleEndian, WriteBytesExt};
 use camera::Camera;
+use color::Color;
 
 fn main() {
 
@@ -37,9 +39,9 @@ fn main() {
 
    let mut img = vec![(0, 0, 0); imgx * imgy];
 
-   let s0 = Sphere::new(0.0, 0.0, -4.0, 2.0);
-   let s1 = Sphere::new(-2.0, 0.0, -5.0, 2.0);
-   let s2 = Sphere::new(2.0, 0.0, -5.0, 2.0);
+   let s0 = Sphere::new(0.0, 0.0, -4.0, 2.0, Color {r: 1.0, g: 0.0, b: 0.0});
+   let s1 = Sphere::new(-2.0, 0.0, -5.0, 2.0, Color {r: 0.0, g: 1.0, b: 0.0});
+   let s2 = Sphere::new(2.0, 0.0, -5.0, 2.0, Color {r: 0.0, g: 0.0, b: 1.0});
 
    let mut shapes: Vec<&Geometry> = Vec::new();
    shapes.push(&s0);
@@ -57,7 +59,7 @@ fn main() {
                None => {},
                Some(hr) => {
                   tmax = hr.t;
-                  color = (hr.color.x as u8, hr.color.y as u8, hr.color.z as u8);
+                  color = hr.color.to_bytes();
                },
             }
          }

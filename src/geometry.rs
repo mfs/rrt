@@ -15,6 +15,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 use vector::{Vector, dot, cross};
 use ray::Ray;
+use color::Color;
 
 pub trait Geometry {
    fn intersect(&self, r: Ray, tmin: f32, tmax: f32) -> Option<HitRecord>;
@@ -24,11 +25,12 @@ pub trait Geometry {
 pub struct Sphere {
    origin: Vector,
    radius: f32,
+   color: Color,
 }
 
 impl Sphere {
-   pub fn new(x: f32, y: f32, z: f32, r: f32) -> Sphere {
-      Sphere { origin: Vector::new(x, y, z), radius: r }
+   pub fn new(x: f32, y: f32, z: f32, r: f32, c: Color) -> Sphere {
+      Sphere { origin: Vector::new(x, y, z), radius: r, color: c }
    }
 }
 
@@ -59,7 +61,7 @@ impl Geometry for Sphere {
       Some(HitRecord {
          t: t,
          normal: Vector::zero(),
-         color: Vector::new(0.0, 0.0, 255.0)
+         color: self.color,
       })
    }
 }
@@ -69,6 +71,7 @@ pub struct Triangle {
    pub v0: Vector,
    pub v1: Vector,
    pub v2: Vector,
+   pub color: Color,
 }
 
 impl Geometry for Triangle {
@@ -101,7 +104,7 @@ impl Geometry for Triangle {
       Some(HitRecord {
          t: t,
          normal: Vector::zero(),
-         color: Vector::new(255.0, 0.0, 0.0)
+         color: self.color,
       })
    }
 }
@@ -109,5 +112,5 @@ impl Geometry for Triangle {
 pub struct HitRecord {
    pub t: f32,
    pub normal: Vector,
-   pub color: Vector,
+   pub color: Color,
 }
