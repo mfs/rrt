@@ -18,41 +18,39 @@ extern crate byteorder;
 mod vector;
 mod ray;
 mod geometry;
+mod camera;
 
 use std::fs::File;
 use std::path::Path;
 use std::io::Write;
-use vector::Vector;
-use ray::Ray;
 use geometry::Sphere;
 use geometry::Geometry;
-use geometry::Triangle;
 use byteorder::{LittleEndian, WriteBytesExt};
+use camera::Camera;
 
 fn main() {
 
    let imgx = 500;
    let imgy = 500;
 
+   let camera = Camera::new(90.0, imgx as f32, imgy as f32);
+
    let mut img = vec![(0, 0, 0); imgx * imgy];
 
-   let dir = Vector::new(0.0, 0.0, -1.0);
-   let s = Sphere::new(250.0, 250.0, -1000.0, 150.0);
-   let t = Triangle {
-      v0: Vector::new(300.0, 600.0, -800.0),
-      v1: Vector::new(0.0, 100.0, -1000.0),
-      v2: Vector::new(450.0, 20.0, -1000.0),
-   };
+   let s0 = Sphere::new(0.0, 0.0, -4.0, 2.0);
+   let s1 = Sphere::new(-2.0, 0.0, -5.0, 2.0);
+   let s2 = Sphere::new(2.0, 0.0, -5.0, 2.0);
 
    let mut shapes: Vec<&Geometry> = Vec::new();
-   shapes.push(&s);
-   shapes.push(&t);
+   shapes.push(&s0);
+   shapes.push(&s1);
+   shapes.push(&s2);
 
    for y in (0 .. imgx) {
       for x in (0 .. imgy) {
          let mut tmax = 100000.0;
          let mut color = (0, 0, 0);
-         let r = Ray { origin: Vector::new(x as f32, y as f32, 0.0), direction: dir };
+         let r = camera.ray(x as f32, y as f32);
 
          for sh in shapes.iter() {
             match sh.intersect(r, 0.00001, tmax) {
