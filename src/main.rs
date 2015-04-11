@@ -29,6 +29,7 @@ use geometry::Geometry;
 use byteorder::{LittleEndian, WriteBytesExt};
 use camera::Camera;
 use color::Color;
+use vector::dot;
 
 fn main() {
 
@@ -51,7 +52,7 @@ fn main() {
    for y in (0 .. imgx) {
       for x in (0 .. imgy) {
          let mut tmax = 100000.0;
-         let mut color = (0, 0, 0);
+         let mut color = (0, 102, 205);
          let r = camera.ray(x as f32, y as f32);
 
          for sh in shapes.iter() {
@@ -59,7 +60,8 @@ fn main() {
                None => {},
                Some(hr) => {
                   tmax = hr.t;
-                  color = hr.color.to_bytes();
+                  let c = hr.color * dot(-r.direction, hr.normal);
+                  color = c.to_bytes();
                },
             }
          }
