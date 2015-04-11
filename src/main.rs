@@ -81,6 +81,6 @@ fn main() {
    // image data
    for pix in img {
       let (p0, p1, p2) = pix;
-      fout.write(&[p0, p1, p2]).unwrap();
+      fout.write(&[p2, p1, p0]).unwrap();
    }
 }
