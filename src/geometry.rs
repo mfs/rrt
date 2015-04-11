@@ -58,9 +58,12 @@ impl Geometry for Sphere {
          return None;
       }
 
+      let p = r.origin + r.direction * t;
+      let n = (p - self.origin).normalize();
+
       Some(HitRecord {
          t: t,
-         normal: Vector::zero(),
+         normal: n,
          color: self.color,
       })
    }
