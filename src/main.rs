@@ -21,6 +21,7 @@ mod ray;
 mod geometry;
 mod camera;
 mod color;
+mod light;
 
 use std::env;
 use std::fs::File;
@@ -31,6 +32,7 @@ use geometry::Sphere;
 use geometry::Geometry;
 use byteorder::{LittleEndian, WriteBytesExt};
 use camera::Camera;
+use light::Light;
 use vector::dot;
 use toml::Parser;
 
@@ -48,6 +50,8 @@ fn main() {
    let imgy = 500;
 
    let camera = Camera::new(90.0, imgx as f32, imgy as f32);
+
+   let light = Light::default();
 
    let mut img = vec![(0, 0, 0); imgx * imgy];
 
