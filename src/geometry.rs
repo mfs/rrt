@@ -29,8 +29,8 @@ pub struct Sphere {
 }
 
 impl Sphere {
-   pub fn new(x: f32, y: f32, z: f32, r: f32, c: Color) -> Sphere {
-      Sphere { origin: Vector::new(x, y, z), radius: r, color: c }
+   pub fn new(x: f32, y: f32, z: f32, r: f32, cr: f32, cg: f32, cb: f32) -> Sphere {
+      Sphere { origin: Vector::new(x, y, z), radius: r, color: Color::new(cr, cg, cb) }
    }
 }
 

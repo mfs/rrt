@@ -14,6 +14,7 @@
  * */
 
 extern crate byteorder;
+extern crate toml;
 
 mod vector;
 mod ray;
@@ -21,17 +22,27 @@ mod geometry;
 mod camera;
 mod color;
 
+use std::env;
 use std::fs::File;
 use std::path::Path;
 use std::io::Write;
+use std::io::Read;
 use geometry::Sphere;
 use geometry::Geometry;
 use byteorder::{LittleEndian, WriteBytesExt};
 use camera::Camera;
-use color::Color;
 use vector::dot;
+use toml::Parser;
 
 fn main() {
+   let mut args = env::args();
+   if args.len() != 2 {
+      println!("usage: rrt <scene.toml>");
+      return;
+   }
+
+   args.next();
+   let filename = args.next().unwrap();
 
    let imgx = 500;
    let imgy = 500;
@@ -40,14 +51,34 @@ fn main() {
 
    let mut img = vec![(0, 0, 0); imgx * imgy];
 
-   let s0 = Sphere::new(0.0, 0.0, -4.0, 2.0, Color {r: 1.0, g: 0.0, b: 0.0});
-   let s1 = Sphere::new(-2.0, 0.0, -5.0, 2.0, Color {r: 0.0, g: 1.0, b: 0.0});
-   let s2 = Sphere::new(2.0, 0.0, -5.0, 2.0, Color {r: 0.0, g: 0.0, b: 1.0});
+   let path = Path::new(&filename);
+   let mut fin = File::open(&path).unwrap();
+   let mut scene = String::new();
+   fin.read_to_string(&mut scene).unwrap();
 
-   let mut shapes: Vec<&Geometry> = Vec::new();
-   shapes.push(&s0);
-   shapes.push(&s1);
-   shapes.push(&s2);
+   let mut shapes: Vec<Box<Geometry>> = Vec::new();
+
+   let mut p = Parser::new(&scene);
+   let toml = p.parse().unwrap();
+   let objects = toml.get("object").unwrap().as_slice().unwrap();
+   for obj in objects {
+      let t = obj.lookup("type").unwrap().as_str().unwrap();
+      match t {
+         "sphere" => {
+            let s = Sphere::new(
+               obj.lookup("origin.0").unwrap().as_float().unwrap() as f32,
+               obj.lookup("origin.1").unwrap().as_float().unwrap() as f32,
+               obj.lookup("origin.2").unwrap().as_float().unwrap() as f32,
+               obj.lookup("radius").unwrap().as_float().unwrap() as f32,
+               obj.lookup("color.0").unwrap().as_float().unwrap() as f32,
+               obj.lookup("color.1").unwrap().as_float().unwrap() as f32,
+               obj.lookup("color.2").unwrap().as_float().unwrap() as f32,
+            );
+            shapes.push(Box::new(s));
+         }
+         _ => { println!("Unknown object {} ignored.", t); }
+      }
+   }
 
    for y in (0 .. imgx) {
       for x in (0 .. imgy) {
