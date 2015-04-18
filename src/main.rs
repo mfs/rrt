@@ -29,10 +29,11 @@ use std::path::Path;
 use std::io::Write;
 use std::io::Read;
 use geometry::Sphere;
-use geometry::Geometry;
+use geometry::{Geometry, HitRecord};
 use byteorder::{LittleEndian, WriteBytesExt};
 use camera::Camera;
 use light::Light;
+use color::Color;
 use vector::dot;
 use toml::Parser;
 
@@ -59,20 +60,26 @@ fn main() {
 
    for y in (0 .. imgx) {
       for x in (0 .. imgy) {
-         let mut tmax = 100000.0;
-         let mut color = (0, 102, 205);
+         let mut tmax = 10000.0;
+         let mut hit: Option<HitRecord> = None;
+
          let r = camera.ray(x as f32, y as f32);
 
+         // find nearest intersection
          for sh in shapes.iter() {
             match sh.intersect(r, 0.00001, tmax) {
-               None => {},
-               Some(hr) => {
-                  tmax = hr.t;
-                  let c = hr.color * dot(-r.direction, hr.normal);
-                  color = c.to_bytes();
-               },
+               None => { },
+               Some(hr) => { tmax = hr.t; hit = Some(hr); },
             }
          }
+
+         let c = match hit {
+            Some(h) => h.color * dot(-r.direction, h.normal),
+            None => Color::new(0.0, 0.4, 0.8),
+         };
+
+         let color = c.to_bytes();
+
          img[x + imgx * (imgy - y - 1)] = color;
       }
    }
