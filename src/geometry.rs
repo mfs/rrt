@@ -16,6 +16,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 use vector::{Vector, dot, cross};
 use ray::Ray;
 use color::Color;
+use toml::Value;
 
 pub trait Geometry {
    fn intersect(&self, r: Ray, tmin: f32, tmax: f32) -> Option<HitRecord>;
@@ -31,6 +32,22 @@ pub struct Sphere {
 impl Sphere {
    pub fn new(x: f32, y: f32, z: f32, r: f32, cr: f32, cg: f32, cb: f32) -> Sphere {
       Sphere { origin: Vector::new(x, y, z), radius: r, color: Color::new(cr, cg, cb) }
+   }
+
+   pub fn from_vec(v: Vec<f32>) -> Sphere {
+      Sphere { origin: Vector::new(v[0], v[1], v[2]), radius: v[3], color: Color::new(v[4], v[5], v[6]) }
+   }
+
+   pub fn import(obj: &Value) -> Result<Sphere, String> {
+      let elements = vec!["origin.0", "origin.1", "origin.2", "radius", "color.0", "color.1", "color.2"];
+      let mut values = Vec::new();
+
+      for e in elements {
+         let value = try!(obj.lookup(e).ok_or("Missing element."));
+         values.push(try!(value.as_float().ok_or("Invalid float.")) as f32);
+      }
+
+      Ok(Sphere::from_vec(values))
    }
 }
 

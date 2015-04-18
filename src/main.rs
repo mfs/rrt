@@ -69,16 +69,10 @@ fn main() {
       let t = obj.lookup("type").unwrap().as_str().unwrap();
       match t {
          "sphere" => {
-            let s = Sphere::new(
-               obj.lookup("origin.0").unwrap().as_float().unwrap() as f32,
-               obj.lookup("origin.1").unwrap().as_float().unwrap() as f32,
-               obj.lookup("origin.2").unwrap().as_float().unwrap() as f32,
-               obj.lookup("radius").unwrap().as_float().unwrap() as f32,
-               obj.lookup("color.0").unwrap().as_float().unwrap() as f32,
-               obj.lookup("color.1").unwrap().as_float().unwrap() as f32,
-               obj.lookup("color.2").unwrap().as_float().unwrap() as f32,
-            );
-            shapes.push(Box::new(s));
+            match Sphere::import(obj) {
+               Ok(s) => shapes.push(Box::new(s)),
+               Err(e) => {println!("Error parsing sphere - {}", e)},
+            }
          }
          _ => { println!("Unknown object {} ignored.", t); }
       }
