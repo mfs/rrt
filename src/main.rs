@@ -53,30 +53,9 @@ fn main() {
 
    let light = Light::default();
 
+   let shapes = import_scene(filename);
+
    let mut img = vec![(0, 0, 0); imgx * imgy];
-
-   let path = Path::new(&filename);
-   let mut fin = File::open(&path).unwrap();
-   let mut scene = String::new();
-   fin.read_to_string(&mut scene).unwrap();
-
-   let mut shapes: Vec<Box<Geometry>> = Vec::new();
-
-   let mut p = Parser::new(&scene);
-   let toml = p.parse().unwrap();
-   let objects = toml.get("object").unwrap().as_slice().unwrap();
-   for obj in objects {
-      let t = obj.lookup("type").unwrap().as_str().unwrap();
-      match t {
-         "sphere" => {
-            match Sphere::import(obj) {
-               Ok(s) => shapes.push(Box::new(s)),
-               Err(e) => {println!("Error parsing sphere - {}", e)},
-            }
-         }
-         _ => { println!("Unknown object {} ignored.", t); }
-      }
-   }
 
    for y in (0 .. imgx) {
       for x in (0 .. imgy) {
@@ -114,4 +93,33 @@ fn main() {
       let (p0, p1, p2) = pix;
       fout.write(&[p2, p1, p0]).unwrap();
    }
+}
+
+fn import_scene(filename: String) -> Vec<Box<Geometry>> {
+
+   let mut shapes: Vec<Box<Geometry>> = Vec::new();
+
+   let path = Path::new(&filename);
+   let mut fin = File::open(&path).unwrap();
+   let mut scene = String::new();
+   fin.read_to_string(&mut scene).unwrap();
+
+   let mut p = Parser::new(&scene);
+   let toml = p.parse().unwrap();
+   let objects = toml.get("object").unwrap().as_slice().unwrap();
+
+   for obj in objects {
+      let t = obj.lookup("type").unwrap().as_str().unwrap();
+      match t {
+         "sphere" => {
+            match Sphere::import(obj) {
+               Ok(s) => shapes.push(Box::new(s)),
+               Err(e) => {println!("Error parsing sphere - {}", e)},
+            }
+         }
+         _ => { println!("Unknown object {} ignored.", t); }
+      }
+   }
+
+   shapes
 }
