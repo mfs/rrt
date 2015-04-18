@@ -77,22 +77,7 @@ fn main() {
       }
    }
 
-   // Write file out as a 24 bit uncompressed TGA.
-   // http://en.wikipedia.org/wiki/Truevision_TGA
-   let ref mut fout = File::create(&Path::new("trace.tga")).unwrap();
-   // field 1,2,3,4
-   fout.write(&[0, 0, 2, 0, 0, 0, 0, 0]).unwrap();
-   // field 5
-   fout.write_u16::<LittleEndian>(0 as u16).unwrap();
-   fout.write_u16::<LittleEndian>(0 as u16).unwrap();
-   fout.write_u16::<LittleEndian>(imgx as u16).unwrap();
-   fout.write_u16::<LittleEndian>(imgy as u16).unwrap();
-   fout.write(&[24, 32]).unwrap();
-   // image data
-   for pix in img {
-      let (p0, p1, p2) = pix;
-      fout.write(&[p2, p1, p0]).unwrap();
-   }
+   save_render(imgx, imgy, img);
 }
 
 fn import_scene(filename: String) -> Vec<Box<Geometry>> {
@@ -123,3 +108,24 @@ fn import_scene(filename: String) -> Vec<Box<Geometry>> {
 
    shapes
 }
+
+fn save_render(imgx: usize, imgy: usize, img: Vec<(u8, u8, u8)> ) {
+
+   // Write file out as a 24 bit uncompressed TGA.
+   // http://en.wikipedia.org/wiki/Truevision_TGA
+   let ref mut fout = File::create(&Path::new("trace.tga")).unwrap();
+   // field 1,2,3,4
+   fout.write(&[0, 0, 2, 0, 0, 0, 0, 0]).unwrap();
+   // field 5
+   fout.write_u16::<LittleEndian>(0 as u16).unwrap();
+   fout.write_u16::<LittleEndian>(0 as u16).unwrap();
+   fout.write_u16::<LittleEndian>(imgx as u16).unwrap();
+   fout.write_u16::<LittleEndian>(imgy as u16).unwrap();
+   fout.write(&[24, 32]).unwrap();
+   // image data
+   for pix in img {
+      let (p0, p1, p2) = pix;
+      fout.write(&[p2, p1, p0]).unwrap();
+   }
+}
+
