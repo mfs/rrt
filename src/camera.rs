@@ -49,6 +49,14 @@ impl Camera {
       }
    }
 
+   pub fn screen_width(&self) -> usize {
+      self.h_pixels as usize
+   }
+
+   pub fn screen_height(&self) -> usize {
+      self.v_pixels as usize
+   }
+
    pub fn ray(self, x: f32, y: f32) -> Ray {
       let u = self.l + (self.r - self.l) * ((x + 0.5) / self.h_pixels);
       let v = self.b + (self.t - self.b) * ((y + 0.5) / self.v_pixels);

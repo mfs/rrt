@@ -22,20 +22,11 @@ mod geometry;
 mod camera;
 mod color;
 mod light;
+mod raytracer;
 
 use std::env;
-use std::fs::File;
-use std::path::Path;
-use std::io::Write;
-use std::io::Read;
-use geometry::Sphere;
-use geometry::{Geometry, HitRecord};
-use byteorder::{LittleEndian, WriteBytesExt};
 use camera::Camera;
-use light::Light;
-use color::Color;
-use vector::dot;
-use toml::Parser;
+use raytracer::RayTracer;
 
 fn main() {
    let mut args = env::args();
@@ -47,92 +38,13 @@ fn main() {
    args.next();
    let filename = args.next().unwrap();
 
-   let imgx = 500;
-   let imgy = 500;
+   let camera = Camera::new(90.0, 500.0, 500.0);
 
-   let camera = Camera::new(90.0, imgx as f32, imgy as f32);
+   let mut rt = RayTracer::new(camera);
 
-   let light = Light::default();
+   rt.import_scene(filename);
 
-   let shapes = import_scene(filename);
+   rt.trace();
 
-   let mut img = vec![(0, 0, 0); imgx * imgy];
-
-   for y in (0 .. imgx) {
-      for x in (0 .. imgy) {
-         let mut tmax = 10000.0;
-         let mut hit: Option<HitRecord> = None;
-
-         let r = camera.ray(x as f32, y as f32);
-
-         // find nearest intersection
-         for sh in shapes.iter() {
-            match sh.intersect(r, 0.00001, tmax) {
-               None => { },
-               Some(hr) => { tmax = hr.t; hit = Some(hr); },
-            }
-         }
-
-         let c = match hit {
-            Some(h) => h.color * dot(-r.direction, h.normal),
-            None => Color::new(0.0, 0.4, 0.8),
-         };
-
-         let color = c.to_bytes();
-
-         img[x + imgx * (imgy - y - 1)] = color;
-      }
-   }
-
-   save_render(imgx, imgy, img);
+   rt.render();
 }
-
-fn import_scene(filename: String) -> Vec<Box<Geometry>> {
-
-   let mut shapes: Vec<Box<Geometry>> = Vec::new();
-
-   let path = Path::new(&filename);
-   let mut fin = File::open(&path).unwrap();
-   let mut scene = String::new();
-   fin.read_to_string(&mut scene).unwrap();
-
-   let mut p = Parser::new(&scene);
-   let toml = p.parse().unwrap();
-   let objects = toml.get("object").unwrap().as_slice().unwrap();
-
-   for obj in objects {
-      let t = obj.lookup("type").unwrap().as_str().unwrap();
-      match t {
-         "sphere" => {
-            match Sphere::import(obj) {
-               Ok(s) => shapes.push(Box::new(s)),
-               Err(e) => {println!("Error parsing sphere - {}", e)},
-            }
-         }
-         _ => { println!("Unknown object {} ignored.", t); }
-      }
-   }
-
-   shapes
-}
-
-fn save_render(imgx: usize, imgy: usize, img: Vec<(u8, u8, u8)> ) {
-
-   // Write file out as a 24 bit uncompressed TGA.
-   // http://en.wikipedia.org/wiki/Truevision_TGA
-   let ref mut fout = File::create(&Path::new("trace.tga")).unwrap();
-   // field 1,2,3,4
-   fout.write(&[0, 0, 2, 0, 0, 0, 0, 0]).unwrap();
-   // field 5
-   fout.write_u16::<LittleEndian>(0 as u16).unwrap();
-   fout.write_u16::<LittleEndian>(0 as u16).unwrap();
-   fout.write_u16::<LittleEndian>(imgx as u16).unwrap();
-   fout.write_u16::<LittleEndian>(imgy as u16).unwrap();
-   fout.write(&[24, 32]).unwrap();
-   // image data
-   for pix in img {
-      let (p0, p1, p2) = pix;
-      fout.write(&[p2, p1, p0]).unwrap();
-   }
-}
-
