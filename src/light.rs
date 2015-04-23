@@ -66,8 +66,7 @@ impl Light for AmbientLight {
 
 impl Light for PointLight {
    fn direction(&self, hr: ShadeRec) -> Vector {
-     //(self.location - hr.hit_point).normalize()
-     Vector::zero() // fix this
+     (self.location - hr.hit_point).normalize()
    }
 
    fn radiance(&self, hr: ShadeRec) -> Color {
