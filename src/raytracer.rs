@@ -18,7 +18,7 @@ use std::path::Path;
 use std::io::{Read, Write};
 use camera::Camera;
 use light::Light;
-use geometry::{Geometry, HitRecord, Sphere};
+use geometry::{Geometry, ShadeRec, Sphere};
 use color::Color;
 use vector::dot;
 use byteorder::{LittleEndian, WriteBytesExt};
@@ -90,7 +90,7 @@ impl RayTracer {
         for y in (0 .. self.camera.screen_height()) {
             for x in (0 .. self.camera.screen_width()) {
                 let mut tmax = 10000.0;
-                let mut hit: Option<HitRecord> = None;
+                let mut hit: Option<ShadeRec> = None;
 
                 let r = self.camera.ray(x as f32, y as f32);
 

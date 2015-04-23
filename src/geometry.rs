@@ -19,7 +19,7 @@ use color::Color;
 use toml::Value;
 
 pub trait Geometry {
-   fn intersect(&self, r: Ray, tmin: f32, tmax: f32) -> Option<HitRecord>;
+   fn intersect(&self, r: Ray, tmin: f32, tmax: f32) -> Option<ShadeRec>;
 }
 
 #[derive(Debug,Copy,Clone)]
@@ -52,7 +52,7 @@ impl Sphere {
 }
 
 impl Geometry for Sphere {
-   fn intersect(&self, r: Ray, tmin: f32, tmax: f32) -> Option<HitRecord> {
+   fn intersect(&self, r: Ray, tmin: f32, tmax: f32) -> Option<ShadeRec> {
 
       let l = self.origin - r.origin;
       let s = dot(l, r.direction);
@@ -78,7 +78,7 @@ impl Geometry for Sphere {
       let p = r.origin + r.direction * t;
       let n = (p - self.origin).normalize();
 
-      Some(HitRecord {
+      Some(ShadeRec {
          t: t,
          normal: n,
          color: self.color,
@@ -95,7 +95,7 @@ pub struct Triangle {
 }
 
 impl Geometry for Triangle {
-   fn intersect(&self, r: Ray, tmin: f32, tmax: f32) -> Option<HitRecord> {
+   fn intersect(&self, r: Ray, tmin: f32, tmax: f32) -> Option<ShadeRec> {
       const EPS: f32 = 1e-5;
       let e1 = self.v1 - self.v0;
       let e2 = self.v2 - self.v0;
@@ -121,7 +121,7 @@ impl Geometry for Triangle {
          return None;
       }
 
-      Some(HitRecord {
+      Some(ShadeRec {
          t: t,
          normal: Vector::zero(),
          color: self.color,
@@ -129,7 +129,7 @@ impl Geometry for Triangle {
    }
 }
 
-pub struct HitRecord {
+pub struct ShadeRec {
    pub t: f32,
    pub normal: Vector,
    pub color: Color,

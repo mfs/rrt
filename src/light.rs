@@ -15,11 +15,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 use vector::Vector;
 use color::Color;
-use geometry::HitRecord;
+use geometry::ShadeRec;
 
 pub trait Light {
-   fn direction(&self, hr: HitRecord) -> Vector;
-   fn radiance(&self, hr: HitRecord) -> Color;
+   fn direction(&self, hr: ShadeRec) -> Vector;
+   fn radiance(&self, hr: ShadeRec) -> Color;
 }
 
 #[derive(Debug,Copy,Clone)]
@@ -55,22 +55,22 @@ impl PointLight {
 }
 
 impl Light for AmbientLight {
-   fn direction(&self, hr: HitRecord) -> Vector {
+   fn direction(&self, hr: ShadeRec) -> Vector {
       Vector::zero()
    }
 
-   fn radiance(&self, hr: HitRecord) -> Color {
+   fn radiance(&self, hr: ShadeRec) -> Color {
       self.color * self.ls
    }
 }
 
 impl Light for PointLight {
-   fn direction(&self, hr: HitRecord) -> Vector {
+   fn direction(&self, hr: ShadeRec) -> Vector {
      //(self.location - hr.hit_point).normalize()
      Vector::zero() // fix this
    }
 
-   fn radiance(&self, hr: HitRecord) -> Color {
+   fn radiance(&self, hr: ShadeRec) -> Color {
       self.color * self.ls
    }
 }
