@@ -80,6 +80,7 @@ impl Geometry for Sphere {
 
       Some(ShadeRec {
          t: t,
+         hit_point: r.origin + r.direction * t,
          normal: n,
          color: self.color,
       })
@@ -123,6 +124,7 @@ impl Geometry for Triangle {
 
       Some(ShadeRec {
          t: t,
+         hit_point: r.origin + r.direction * t,
          normal: Vector::zero(),
          color: self.color,
       })
@@ -131,6 +133,7 @@ impl Geometry for Triangle {
 
 pub struct ShadeRec {
    pub t: f32,
+   pub hit_point: Vector,
    pub normal: Vector,
    pub color: Color,
 }
