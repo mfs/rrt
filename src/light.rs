@@ -15,23 +15,62 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 use vector::Vector;
 use color::Color;
+use geometry::HitRecord;
 
-#[derive(Debug,Copy,Clone)]
-pub struct Light {
-   pub origin: Vector,
-   pub amb: Color,
-   pub diff: Color,
-   pub spec: Color,
+pub trait Light {
+   fn direction(&self, hr: HitRecord) -> Vector;
+   fn radiance(&self, hr: HitRecord) -> Color;
 }
 
-impl Light {
-   pub fn default() -> Light {
-      Light {
-         origin: Vector::zero(),
-         amb: Color::new(0.2, 0.2, 0.2),
-         diff: Color::new(0.7, 0.7, 0.7),
-         spec: Color::new(0.3, 0.3, 0.3),
+#[derive(Debug,Copy,Clone)]
+pub struct AmbientLight {
+   pub color: Color,
+   pub ls: f32, // radiance scaling factor
+}
+
+#[derive(Debug,Copy,Clone)]
+pub struct PointLight {
+   pub location: Vector,
+   pub color: Color,
+   pub ls: f32, // radiance scaling factor
+}
+
+impl AmbientLight {
+   pub fn new() -> AmbientLight {
+      AmbientLight {
+         color: Color::new(1.0, 1.0, 1.0),
+         ls: 0.2,
       }
    }
 }
 
+impl PointLight {
+   pub fn new() -> PointLight {
+      PointLight {
+         location: Vector::zero(),
+         color: Color::new(1.0, 1.0, 1.0),
+         ls: 0.2,
+      }
+   }
+}
+
+impl Light for AmbientLight {
+   fn direction(&self, hr: HitRecord) -> Vector {
+      Vector::zero()
+   }
+
+   fn radiance(&self, hr: HitRecord) -> Color {
+      self.color * self.ls
+   }
+}
+
+impl Light for PointLight {
+   fn direction(&self, hr: HitRecord) -> Vector {
+     //(self.location - hr.hit_point).normalize()
+     Vector::zero() // fix this
+   }
+
+   fn radiance(&self, hr: HitRecord) -> Color {
+      self.color * self.ls
+   }
+}

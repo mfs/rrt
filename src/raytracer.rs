@@ -27,7 +27,7 @@ use toml::Parser;
 pub struct RayTracer {
     camera: Camera,
     image: Vec<(u8, u8, u8)>,
-    lights: Vec<Light>,
+    lights: Vec<Box<Light>>,
     scene: Vec<Box<Geometry>>,
 }
 
