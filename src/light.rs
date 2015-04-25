@@ -16,6 +16,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 use vector::Vector;
 use color::Color;
 use geometry::ShadeRec;
+use toml::Value;
 
 pub trait Light {
    fn direction(&self, hr: ShadeRec) -> Vector;
@@ -42,6 +43,22 @@ impl AmbientLight {
          ls: 0.2,
       }
    }
+
+   pub fn from_vec(v: Vec<f32>) -> AmbientLight {
+      AmbientLight { color: Color::new(v[0], v[1], v[2]), ls: v[3] }
+   }
+
+   pub fn import(obj: &Value) -> Result<AmbientLight, String> {
+      let elements = vec!["color.0", "color.1", "color.2", "ls"];
+      let mut values = Vec::new();
+
+      for e in elements {
+         let value = try!(obj.lookup(e).ok_or("Missing element."));
+         values.push(try!(value.as_float().ok_or("Invalid float.")) as f32);
+      }
+
+      Ok(AmbientLight::from_vec(values))
+   }
 }
 
 impl PointLight {
@@ -51,6 +68,22 @@ impl PointLight {
          color: Color::new(1.0, 1.0, 1.0),
          ls: 0.2,
       }
+   }
+
+   pub fn from_vec(v: Vec<f32>) -> PointLight {
+      PointLight { location: Vector::new(v[0], v[1], v[2]), color: Color::new(v[3], v[4], v[5]), ls: v[6] }
+   }
+
+   pub fn import(obj: &Value) -> Result<PointLight, String> {
+      let elements = vec!["location.0", "location.1", "location.2", "color.0", "color.1", "color.2", "ls"];
+      let mut values = Vec::new();
+
+      for e in elements {
+         let value = try!(obj.lookup(e).ok_or("Missing element."));
+         values.push(try!(value.as_float().ok_or("Invalid float.")) as f32);
+      }
+
+      Ok(PointLight::from_vec(values))
    }
 }
 

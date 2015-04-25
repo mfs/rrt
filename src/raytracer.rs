@@ -17,7 +17,7 @@ use std::fs::File;
 use std::path::Path;
 use std::io::{Read, Write};
 use camera::Camera;
-use light::Light;
+use light::{PointLight, Light};
 use geometry::{Geometry, ShadeRec, Sphere};
 use color::Color;
 use vector::dot;
@@ -62,6 +62,13 @@ impl RayTracer {
                         Err(e) => {println!("Error parsing sphere - {}", e)},
                     }
                 }
+                "point_light" => {
+                    match PointLight::import(obj) {
+                        Ok(pl) => self.lights.push(Box::new(pl)),
+                        Err(e) => {println!("Error parsing sphere - {}", e)},
+                    }
+                }
+
                 _ => { println!("Unknown object {} ignored.", t); }
            }
         }
