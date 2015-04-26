@@ -75,10 +75,10 @@ impl RayTracer {
         }
     }
 
-    pub fn render(self)  {
+    pub fn render(self, filename: String)  {
         // Write file out as a 24 bit uncompressed TGA.
         // http://en.wikipedia.org/wiki/Truevision_TGA
-        let ref mut fout = File::create(&Path::new("trace.tga")).unwrap();
+        let ref mut fout = File::create(&Path::new(&filename)).unwrap();
         // field 1,2,3,4
         fout.write(&[0, 0, 2, 0, 0, 0, 0, 0]).unwrap();
         // field 5

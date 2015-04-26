@@ -30,21 +30,22 @@ use raytracer::RayTracer;
 
 fn main() {
    let mut args = env::args();
-   if args.len() != 2 {
-      println!("usage: rrt <scene.toml>");
+   if args.len() != 3 {
+      println!("usage: rrt <scene.toml> <output.tga>");
       return;
    }
 
    args.next();
-   let filename = args.next().unwrap();
+   let in_filename = args.next().unwrap();
+   let out_filename = args.next().unwrap();
 
    let camera = Camera::new(90.0, 500.0, 500.0);
 
    let mut rt = RayTracer::new(camera);
 
-   rt.import_scene(filename);
+   rt.import_scene(in_filename);
 
    rt.trace();
 
-   rt.render();
+   rt.render(out_filename);
 }
