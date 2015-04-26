@@ -1,0 +1,29 @@
+[[object]]
+type = "sphere"
+origin = [0.0, 0.0, -4.0]
+radius = 2.0
+color = [1.0, 1.0, 1.0]
+
+[[object]]
+type = "sphere"
+origin = [-2.0, 0.0, -5.0]
+radius = 2.0
+color = [1.0, 1.0, 1.0]
+
+[[object]]
+type = "sphere"
+origin = [2.0, 0.0, -5.0]
+radius = 2.0
+color = [1.0, 1.0, 1.0]
+
+[[object]]
+type = "point_light"
+location = [-2.0, 0.0, 0.0]
+color = [1.0, 0.0, 0.0]
+ls = 0.8
+
+[[object]]
+type = "point_light"
+location = [2.0, 0.0, 0.0]
+color = [0.0, 0.0, 1.0]
+ls = 0.8
