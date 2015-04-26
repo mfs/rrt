@@ -21,6 +21,7 @@ use light::{PointLight, Light};
 use geometry::{Geometry, ShadeRec, Sphere};
 use color::Color;
 use vector::dot;
+use ray::Ray;
 use byteorder::{LittleEndian, WriteBytesExt};
 use toml::Parser;
 
@@ -93,6 +94,23 @@ impl RayTracer {
         }
     }
 
+    pub fn shade(&mut self, sr: &ShadeRec, ray: &Ray) -> Color {
+        let mut c  = Color::new(0.0, 0.0, 0.0);
+
+        // if we had a global ambient light we would add it in here
+
+        // calculate diffuse lighting for each light
+        for l in self.lights.iter() {
+            let dir = l.direction(sr);
+            let d = dot(dir, sr.normal);
+            if d > 0.0 {
+                c = c + l.radiance(&sr) * sr.color * d;
+            }
+        }
+
+        c
+    }
+
     pub fn trace(&mut self) {
         for y in (0 .. self.camera.screen_height()) {
             for x in (0 .. self.camera.screen_width()) {
@@ -109,9 +127,8 @@ impl RayTracer {
                     }
                 }
 
-                // calc simple shading for now
                 let c = match hit {
-                    Some(h) => h.color * dot(-r.direction, h.normal),
+                    Some(h) => self.shade(&h, &r),
                     None => Color::new(0.0, 0.4, 0.8),
                 };
 
