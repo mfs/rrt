@@ -21,6 +21,7 @@ mod ray;
 mod geometry;
 mod camera;
 mod color;
+mod brdf;
 mod light;
 mod raytracer;
 
